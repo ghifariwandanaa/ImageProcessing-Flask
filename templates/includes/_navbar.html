@@ -1,0 +1,28 @@
+<div class="site-mobile-menu site-navbar-target">
+    <div class="site-mobile-menu-header">
+        <div class="site-mobile-menu-close">
+            <span class="icofont-close js-menu-toggle"></span>
+        </div>
+    </div>
+    <div class="site-mobile-menu-body"></div>
+</div>
+
+<nav class="site-nav">
+    <div class="container">
+        <div class="menu-bg-wrap">
+            <div class="site-navigation">
+                <div class="row g-0 align-items-center">
+                    <div class="col-2">
+                        <a href="/" class="logo m-0 float-start">PixelMaster<span class="text-primary">.</span></a>
+                    </div>
+                    <div class="col-10 text-end">
+                        <ul class="js-clone-nav d-none d-lg-inline-block text-start site-menu mx-auto">
+                            <li class="{{ 'active' if request.path != '/about' else '' }}"><a href="/">Home</a></li>
+                            <li class="{{ 'active' if request.path == '/about' else '' }}"><a href="/about">About</a></li>
+                        </ul>                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>

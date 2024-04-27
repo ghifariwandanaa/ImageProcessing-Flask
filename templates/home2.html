@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<!-- <div class="container-fluid"> Menggunakan container-fluid untuk mengisi seluruh lebar layar -->
+    <div class="jumbotron d-flex align-items-center justify-content-center vh-100"> <!-- Menggunakan vh-100 untuk tinggi penuh layar -->
+        <div class="text-center">
+            <div class="col-8 mx-auto text-center mt-5 pt-2 pb-5">
+                <h1 class="display-4">PixelMaster</h1>
+                <p class="lead">PixelMaster adalah platform unggahan gambar yang dilengkapi dengan berbagai alat pengolahan citra digital. Pengguna dapat memodifikasi, memperbaiki, dan meningkatkan kualitas gambar mereka sebelum mengunggahnya.</p>
+                <form id="uploadForm" action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
+                    <div class="input-group mb-3">
+                        <div class="custom-file">
+                            <input type="file" name="file" class="custom-file-input" id="inputGroupFile04" accept="image/*">
+                            <label class="custom-file-label" for="inputGroupFile04">Pilih Gambar</label>
+                        </div>
+                    </div>
+                    <div class="input-group mb-3 d-flex justify-content-center">
+                        <button type="submit" class="btn btn-primary">Upload</button>
+                    </div>
+                </form> 
+            </div>
+        </div>
+    </div>
+<!-- </div> -->
+{% endblock %}

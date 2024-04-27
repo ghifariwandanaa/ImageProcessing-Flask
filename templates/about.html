@@ -1,0 +1,21 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<div class="hero overlay">
+    <img src="{{ url_for('static', filename='images/blob.svg') }}" alt="" class="img-fluid blob">
+    <div class="container">
+        <div class="row align-items-center pt-5">
+            <div class="col-md-6 mx-auto text-center">
+                <div class="card shadow p-3 mb-5 bg-white rounded">
+                    <div class="card-body">
+                        <img src="{{ url_for('static', filename='img/profil.jpeg') }}" alt="Gambar Saya" class="card-img-top img-fluid w-50 rounded-circle mb-3" style="width: 50%;">
+                        <h4 class="card-title mb-2 mt-4" style="color: black;">Nama: Amelia Dewi Agustiani</h4>
+                        <h6 class="card-text mb-2" style="color: black;">Kelas: 3A - D4 Teknik Informatika</h6>
+                        <h6 class="card-text" style="color: black">Nim: 211524002</h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
