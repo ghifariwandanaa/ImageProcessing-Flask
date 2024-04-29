@@ -28,7 +28,7 @@ def nocache(view):
 @app.route("/")
 @nocache
 def index():
-    return render_template("home.html", file_path="img/image_here.jpg")
+    return render_template("uploaded.html", file_path="img/image_here.jpg")
 
 
 @app.route("/about")

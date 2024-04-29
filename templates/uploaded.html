@@ -1,40 +1,68 @@
 {% extends "layout.html" %}
 {% block body %}
+<style>
+    /* CSS untuk menyesuaikan tampilan navbar */
+    .neader {
+        border-radius: 15px; /* Menambahkan lengkungan pada sudut */
+        transition: background-color 0.3s; /* Transisi untuk efek hover */
+    }
+
+    .neader:hover {
+        background-color: #2c4ab8; /* Warna latar belakang berubah saat dihover */
+    }
+
+    /* CSS untuk animasi tombol navbar */
+    .btn-primary {
+        transition: transform 0.2s ease; /* Transisi untuk efek transform */
+    }
+
+    .btn-primary:hover {
+        transform: scale(1.1); /* Memperbesar tombol saat dihover */
+    }
+</style>
+
 <div class="neader" style="height: 120px; background-color: #305fe8;">
     <!-- <img src="{{ url_for('static', filename='images/blob.svg') }}" alt="" class="img-fluid blob"> -->
-    
 </div>
 
 <div class="text-center mt-4 pt-4" style="color: black;">
     <div class="container px-0">
         <div class="row">
+            <!-- Kolom Kiri -->
             <div class="col-md-8 order-md-2">
-                <!-- <div class="container"> -->
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <img class="img-fluid" src="{{ url_for('static', filename=file_path) }}" alt="image here">
+                <center>
+                    <form id="uploadForm" action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
+                        <div class="input-group mb-3">
+                            <div class="custom-file">
+                                <input type="file" name="file" class="custom-file-input" id="inputGroupFile04" accept="image/*">
+                                <label class="custom-file-label" for="inputGroupFile04">Pilih Gambar</label>
+                            </div>
                         </div>
-                        {% if num_object is defined and request.path == '/count_white_objects' %}
-                        <div class="col-3 mt-4">
-                            <h6 style="font-weight: bold;">Jumlah Object : {{ num_object }}</h6>
+                        <div class="input-group mb-3 d-flex justify-content-center" id="uploadButtonWrapper">
+                            <button type="submit" class="btn btn-primary">Upload</button>
                         </div>
-                        {% endif %}
+                    </form>
+                </center>
+                <br><br>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <img class="img-fluid" src="{{ url_for('static', filename=file_path) }}" alt="image here">
                     </div>
-                <!-- </div> -->
+                    {% if num_object is defined and request.path == '/count_white_objects' %}
+                    <div class="col-3 mt-4">
+                        <h6 style="font-weight: bold;">Jumlah Object : {{ num_object }}</h6>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
 
+            <!-- Kolom Kanan -->
             <div class="col-md-4 order-md-1" style="max-height: 80vh; overflow-y: auto; padding-right: 30px;">
                 <h3 style="font-weight: bold;">Menu</h3>
-                <!-- Tombol tutup -->
-                <!-- <button class="btn btn-secondary mb-2" type="button" data-bs-toggle="collapse" data-bs-target="#sideMenu" aria-expanded="false" aria-controls="sideMenu">
-                    Tutup
-                </button> -->
-                
-                <!-- <h3 style="font-weight: bold;">Menu</h3> -->
-                <div class="collapse d-md-block" id="sideMenu">
-                <hr>
-                <h5>Normal</h5>
-                <div class="row">
+                <div class="collapse d-md-block" id="color">
+                    <hr>
+                    <h5>Normal</h5>
+                    <div class="row">
                     <div class="col-md-6">
                         <div class="mt-2 bd-highlight">
                             <form id="" action="{{ url_for('normal') }}" method="POST" enctype="multipart/form-data">
@@ -240,12 +268,22 @@
                             </form>
                         </div>
                     </div>
-                    
-                </div>
+
                 </div>
             </div>
-            
         </div>
     </div>
 </div>
+
+<script>
+    document.getElementById('inputGroupFile04').addEventListener('change', function() {
+        var fileInput = this;
+        var uploadButtonWrapper = document.getElementById('uploadButtonWrapper');
+
+        if (fileInput.files.length > 0) {
+            // Hide the upload button wrapper
+            uploadButtonWrapper.style.display = 'none';
+        }
+    });
+</script>
 {% endblock %}

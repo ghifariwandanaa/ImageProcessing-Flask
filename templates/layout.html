@@ -32,13 +32,16 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/flatpickr.min.css') }}">
 
 
-	<title>PixelMaster.</title>
+	<title>Pecede</title>
 </head>
+
 <body>
+	
     {% include "includes/_navbar.html" %}
     <!-- <div class="container-fluid"> -->
         {% block body %} {% endblock %}
     <!-- </div> -->
+	
 	
 	<script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
 	<script src="{{ url_for('static', filename='js/tiny-slider.js') }}"></script>
