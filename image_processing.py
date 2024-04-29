@@ -380,3 +380,94 @@ def threshold(lower_thres, upper_thres):
     img_arr[condition] = 255
     new_img = Image.fromarray(img_arr)
     new_img.save("static/img/img_now.jpg")
+
+def dilasi():
+    # Baca citra
+    # Baca dalam skala BINER
+    img = cv2.imread("static/img/img_now.jpg", cv2.IMREAD_GRAYSCALE)
+    _, binary_image = cv2.threshold(img, 70, 255, cv2.THRESH_BINARY)
+    kernel_size = 3
+
+    # Definisikan kernel untuk erosi
+    kernel = np.ones((kernel_size, kernel_size), np.uint8)
+
+    # Lakukan erosi
+    dilasi_img = cv2.dilate(binary_image, kernel, iterations=3)
+
+    # Simpan citra yang telah dierosi
+    cv2.imwrite("static/img/img_now.jpg", dilasi_img)
+
+
+def erosi():
+    # Baca citra
+    # Baca dalam skala BINER
+    img = cv2.imread("static/img/img_now.jpg", cv2.IMREAD_GRAYSCALE)
+    _, binary_image = cv2.threshold(img, 70, 255, cv2.THRESH_BINARY)
+    kernel_size = 3
+
+    # Definisikan kernel untuk erosi
+    kernel = np.ones((kernel_size, kernel_size), np.uint8)
+
+    # Lakukan erosi
+    erosi_img = cv2.erode(binary_image, kernel, iterations=3)
+
+    # Simpan citra yang telah dierosi
+    cv2.imwrite("static/img/img_now.jpg", erosi_img)
+
+
+def Opening():
+    # Baca citra
+    # Baca dalam skala BINER
+    img = cv2.imread("static/img/img_now.jpg", cv2.IMREAD_GRAYSCALE)
+    _, binary_image = cv2.threshold(img, 70, 255, cv2.THRESH_BINARY)
+    kernel_size = 3
+
+    # Definisikan kernel untuk erosi
+    kernel = np.ones((kernel_size, kernel_size), np.uint8)
+
+    # Lakukan erosi
+    erosi_img = cv2.erode(binary_image, kernel, iterations=3)
+
+    opening_img = cv2.dilate(erosi_img, kernel, iterations=3)
+
+    # Simpan citra yang telah dierosi
+    cv2.imwrite("static/img/img_now.jpg", opening_img)
+
+
+def Closing():
+    # Baca citra
+    # Baca dalam skala BINER
+    img = cv2.imread("static/img/img_now.jpg", cv2.IMREAD_GRAYSCALE)
+    _, binary_image = cv2.threshold(img, 70, 255, cv2.THRESH_BINARY)
+    kernel_size = 3
+
+    # Definisikan kernel untuk erosi
+    kernel = np.ones((kernel_size, kernel_size), np.uint8)
+
+    dilasi_img = cv2.dilate(binary_image, kernel, iterations=3)
+
+    # Lakukan erosi
+    closing_img = cv2.erode(dilasi_img, kernel, iterations=3)
+
+    # Simpan citra yang telah dierosi
+    cv2.imwrite("static/img/img_now.jpg", closing_img)
+
+
+def count_white_objects():
+    # Baca citra dalam skala keabuan
+    img = cv2.imread("static/img/img_now.jpg", cv2.IMREAD_GRAYSCALE)
+
+    _, img_binary = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
+
+    # Lakukan operasi morfologi untuk membersihkan gambar
+    kernel = np.ones((5, 5), np.uint8)
+    img_binary = cv2.morphologyEx(img_binary, cv2.MORPH_OPEN, kernel)
+
+    # Temukan kontur dalam citra
+    contours, _ = cv2.findContours(
+        img_binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    # Hitung jumlah objek putih
+    num_white_objects = len(contours)
+    print("Jumlah objek putih:", num_white_objects)
+    return num_white_objects

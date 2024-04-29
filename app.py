@@ -185,6 +185,39 @@ def histogram_rgb():
         return render_template("histogram.html", file_paths=["img/grey_histogram.jpg"])
     else:
         return render_template("histogram.html", file_paths=["img/red_histogram.jpg", "img/green_histogram.jpg", "img/blue_histogram.jpg"])
+    
+
+@app.route("/dilasi", methods=["POST"])
+@nocache
+def dilasi():
+    image_processing.dilasi()
+    return render_template("uploaded.html", file_path="img/img_now.jpg")
+
+@app.route("/erosi", methods=["POST"])
+@nocache
+def erosi():
+    image_processing.erosi()
+    return render_template("uploaded.html", file_path="img/img_now.jpg")
+
+@app.route("/opening", methods=["POST"])
+@nocache
+def opening():
+    image_processing.Opening()
+    return render_template("uploaded.html", file_path="img/img_now.jpg")
+
+@app.route("/closing", methods=["POST"])
+@nocache
+def closing():
+    image_processing.Closing()
+    return render_template("uploaded.html", file_path="img/img_now.jpg")
+
+@app.route("/count_white_objects", methods=["POST"])
+@nocache
+def count_white_objects():
+    num_object = image_processing.count_white_objects()
+    return render_template("uploaded.html", file_path="img/img_now.jpg",num_object=num_object)
+
+
 
 
 @app.route("/thresholding", methods=["POST"])
