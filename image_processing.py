@@ -6,6 +6,8 @@ from collections import Counter
 from pylab import savefig
 import cv2
 import matplotlib
+from skimage.morphology import skeletonize
+import json
 matplotlib.use('Agg') 
 
 
@@ -471,3 +473,150 @@ def count_white_objects():
     num_white_objects = len(contours)
     print("Jumlah objek putih:", num_white_objects)
     return num_white_objects
+
+
+# # Fungsi untuk pra-pemrosesan citra
+def pra_pemrosesan_citra(lokasi_citra):
+    # Membaca citra
+    citra = cv2.imread(lokasi_citra, cv2.IMREAD_GRAYSCALE)
+    # Mengubah citra menjadi citra biner menggunakan metode deteksi tepi
+    _, citra_biner = cv2.threshold(citra, 128, 255, cv2.THRESH_BINARY_INV)
+    # Mencari kontur citra
+    kontur, _ = cv2.findContours(citra_biner, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    # Memilih kontur terbesar
+    kontur_terbesar = max(kontur, key=cv2.contourArea)
+    # print(kontur_terbesar)
+    return kontur_terbesar
+
+def hitung_freeman_chain_code(kontur):
+    kode_chain = []
+    titik_valid = []
+    arah = [0, 7, 6, 5, 4, 3, 2, 1]
+    perubahan = [(1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1)]
+
+    # Mendapatkan titik-titik kontur
+    titik = [tuple(poin[0]) for poin in kontur]
+
+    # Menemukan titik awal (titik paling kiri)
+    indeks_awal = titik.index(min(titik, key=lambda x: x[0]))
+
+    titik_sekarang = titik[indeks_awal]
+    titik_awal = titik[indeks_awal]
+
+    # Mengikuti kontur dan menghasilkan kode chain
+    while True:
+        found = False
+        ra={0,1,2,3,4,5,6,7}
+        for i in ra:
+            next_point = (titik_sekarang[0] + perubahan[i][0], titik_sekarang[1] + perubahan[i][1])
+            if next_point in titik:
+                found = True
+                if next_point in titik_valid:
+                    continue
+                else :
+                    titik_valid.append(next_point)
+                    break
+        if not found:
+            break
+        kode_chain.append(arah[i])  
+        titik_sekarang = next_point
+        if titik_sekarang == titik_awal:
+            break
+
+    return kode_chain
+
+# Fungsi untuk penipisan citra menggunakan thinning
+def penipisan_citra(lokasi_citra):
+    citra = cv2.imread(lokasi_citra, cv2.IMREAD_GRAYSCALE)
+    _, citra_biner = cv2.threshold(citra, 128, 255, cv2.THRESH_BINARY_INV)
+    citra_penipisan = skeletonize(citra_biner)
+    # Konversi tipe data citra menjadi uint8
+    citra_penipisan = citra_penipisan.astype(np.uint8)
+    kontur, _ = cv2.findContours(citra_penipisan, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    citra_penipisan = max(kontur, key=cv2.contourArea)
+    return citra_penipisan
+
+# Fungsi untuk pengenalan digit
+def kenali_digit(kode_chain, basis_pengetahuan):
+    jarak_minimum = float('inf')
+    digit_terkenali = None
+    for digit, referensi_kode_chain in basis_pengetahuan.items():
+        jarak = sum(1 for a, b in zip(kode_chain, referensi_kode_chain) if a != b)
+        if jarak < jarak_minimum:
+            jarak_minimum = jarak
+            digit_terkenali = digit
+    return digit_terkenali
+
+# Fungsi untuk melakukan pengujian pengenalan angka
+def uji_pengenalan_angka(daftar_citra_uji, basis_pengetahuan):
+    digit=[]
+    for lokasi_citra_uji in daftar_citra_uji:
+        kode_chain_uji = hitung_freeman_chain_code(pra_pemrosesan_citra(lokasi_citra_uji))
+        digit_terkenali = kenali_digit(kode_chain_uji, basis_pengetahuan)
+        digit.append(digit_terkenali)
+        # print(f"Digit terkenali untuk {lokasi_citra_uji}: {digit_terkenali}")
+    joined_digits = ''.join(map(str, digit))
+    print("digit dikenali =", joined_digits)
+    
+
+    # Fungsi untuk menyimpan basis pengetahuan ke dalam file JSON
+def     simpan_ke_json(basis_pengetahuan, nama_file):
+    with open(nama_file, "w") as file:
+        json.dump(basis_pengetahuan, file)
+
+def segmentasi_digit(lokasi_citra):
+    # Membaca citra
+    citra = cv2.imread(lokasi_citra, cv2.IMREAD_GRAYSCALE)
+    # Mengubah citra menjadi citra biner menggunakan metode deteksi tepi
+    _, citra_biner = cv2.threshold(citra, 128, 255, cv2.THRESH_BINARY_INV)
+    # Mencari kontur citra
+    kontur, _ = cv2.findContours(citra_biner, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    # Mengurutkan kontur berdasarkan koordinat x dari kiri ke kanan
+    kontur_terurut = sorted(kontur, key=lambda c: cv2.boundingRect(c)[0])
+    return kontur_terurut
+
+
+def kenali_digit_segmentasi(daftar_kontur, basis_pengetahuan):
+    digit = []
+    for kontur in daftar_kontur:
+        kode_chain = hitung_freeman_chain_code(kontur)
+        digit_terkenali = kenali_digit(kode_chain, basis_pengetahuan)
+        digit.append(digit_terkenali)
+    joined_digits = ''.join(map(str, digit))
+    return joined_digits
+
+def uji_pengenalan_angka_segmentasi(daftar_citra_uji, basis_pengetahuan):
+    for lokasi_citra_uji in daftar_citra_uji:
+        daftar_kontur = segmentasi_digit(lokasi_citra_uji)
+        digit_dikenali = kenali_digit_segmentasi(daftar_kontur, basis_pengetahuan)
+        # print(f"Digit yang dikenali dari {lokasi_citra_uji}: {digit_dikenali}")
+        return digit_dikenali
+
+def training_data():
+    kode_chain_freeman_digit = {}
+    kode_chain_penipisan_digit = {}
+    nama_citra = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+    for digit, nama in enumerate(nama_citra):
+        lokasi_citra = f"angkas/{nama}.png"
+        kontur = pra_pemrosesan_citra(lokasi_citra)
+        kode_chain = hitung_freeman_chain_code(kontur)
+        kode_chain_freeman_digit[digit] = kode_chain
+        
+        citra_penipisan = penipisan_citra(lokasi_citra)
+        kode_chain = hitung_freeman_chain_code(citra_penipisan)
+        kode_chain_penipisan_digit[digit] = kode_chain
+
+    simpan_ke_json(kode_chain_freeman_digit, "knowledge_base_metode1.json")
+    simpan_ke_json(kode_chain_penipisan_digit, "knowledge_base_metode2.json")
+
+def load_knowledge_base(filename):
+    with open(filename, "r") as file:
+        knowledge_base = json.load(file)
+    return knowledge_base
+
+def indent_citra():
+    kode_chain_freeman_digit = load_knowledge_base("knowledge_base_metode1.json")
+    daftar_citra_uji = ["static/img/img_now.jpg"]
+    digit = uji_pengenalan_angka_segmentasi(daftar_citra_uji, kode_chain_freeman_digit)
+    print("digit yang dikenali",digit)
+    return digit

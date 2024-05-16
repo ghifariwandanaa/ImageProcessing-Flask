@@ -31,26 +31,43 @@
             <!-- Kolom Kiri -->
             <div class="col-md-8 order-md-2">
                 <center>
-                    <form id="uploadForm" action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data">
-                        <div class="input-group mb-3">
-                            <div class="custom-file">
-                                <input type="file" name="file" class="custom-file-input" id="inputGroupFile04" accept="image/*">
-                                <label class="custom-file-label" for="inputGroupFile04">Pilih Gambar</label>
-                            </div>
-                        </div>
-                        <div class="input-group mb-3 d-flex justify-content-center" id="uploadButtonWrapper">
-                            <button type="submit" class="btn btn-primary">Upload</button>
-                        </div>
+                    <!-- Sembunyikan tombol asli -->
+                    <form id="uploadForm" action="{{ url_for('upload') }}" method="POST" enctype="multipart/form-data" style="display: none;">
+                        <input type="file" name="file" id="fileInput" accept="image/*">
                     </form>
+                    <!-- Tambahkan tombol kustom -->
+                    <button onclick="uploadImage()" class="btn btn-primary">Upload Gambar</button>
                 </center>
+                
+                <script>
+                    function uploadImage() {
+                        // Ambil input file
+                        var fileInput = document.getElementById("fileInput");
+                        // Klik input file secara otomatis
+                        fileInput.click();
+                
+                        // Saat formulir di-submit, halaman akan direfresh
+                        fileInput.addEventListener("change", function() {
+                            // Submit formulir
+                            document.getElementById("uploadForm").submit();
+                        });
+                    }
+                </script>
+                
                 <br><br>
                 <div class="row">
                     <div class="col-lg-12">
                         <img class="img-fluid" src="{{ url_for('static', filename=file_path) }}" alt="image here">
                     </div>
                     {% if num_object is defined and request.path == '/count_white_objects' %}
-                    <div class="col-3 mt-4">
+                    <div class="col-12 mt-4">
                         <h6 style="font-weight: bold;">Jumlah Object : {{ num_object }}</h6>
+                    </div>
+                    {% endif %}
+
+                    {% if num_object is defined and request.path == '/identifikasi_number' %}
+                    <div class="col-12 mt-4">
+                        <h6 style="font-weight: bold;">Number yang teridentifikasi : {{ num_object }}</h6>
                     </div>
                     {% endif %}
                 </div>
@@ -268,6 +285,27 @@
                             </form>
                         </div>
                     </div>
+
+                </div>
+                <hr/>
+                <h5>Identifikasi Number Citra</h5>
+                <div class="row">
+                    <div class="col-md-12">
+
+                        <div class="col-md-12">
+                            <div class="mt-2 flex-fill bd-highlight">
+                                <form id="" action="{{ url_for('training_data') }}" method="POST" enctype="multipart/form-data">
+                                    <button type="submit" class="btn btn-primary btn-block" style="width: 100%;">Training Data</button>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="mt-2 flex-fill bd-highlight">
+                            <form id="" action="{{ url_for('indent_citra') }}" method="POST" enctype="multipart/form-data">
+                                <button type="submit" class="btn btn-primary btn-block" style="width: 100%;">Identifikasi Number</button>
+                            </form>
+                        </div>
+                    </div>
+                
 
                 </div>
             </div>

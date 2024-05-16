@@ -217,7 +217,17 @@ def count_white_objects():
     num_object = image_processing.count_white_objects()
     return render_template("uploaded.html", file_path="img/img_now.jpg",num_object=num_object)
 
+@app.route("/identifikasi_number", methods=["POST"])
+@nocache
+def indent_citra():
+    num_object = image_processing.indent_citra()
+    return render_template("uploaded.html", file_path="img/img_now.jpg",num_object=num_object)
 
+@app.route("/training_data", methods=["POST"])
+@nocache
+def training_data():
+    image_processing.training_data()
+    return render_template("uploaded.html", file_path="img/img_now.jpg")
 
 
 @app.route("/thresholding", methods=["POST"])
