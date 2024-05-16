@@ -70,7 +70,9 @@
 *::before,
 *::after {
   -webkit-box-sizing: border-box;
-  box-sizing: border-box; }
+  box-sizing: border-box; 
+  justify-content: center;
+  align-items: center; }
 
 @media (prefers-reduced-motion: no-preference) {
   :root {
@@ -294,6 +296,7 @@ select,
 optgroup,
 textarea {
   margin: 0;
+  padding: 5px;
   font-family: inherit;
   font-size: inherit;
   line-height: inherit; }
@@ -9222,6 +9225,8 @@ textarea.form-control-lg {
   font-size: 24px;
   color: #fff;
   font-weight: 700; }
+  .logo-container {
+    text-align: center; }
   .logo span {
     color: rgba(255, 255, 255, 0.5) !important; }
   .logo:hover {

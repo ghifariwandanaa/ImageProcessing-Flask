@@ -19,16 +19,26 @@
     .btn-primary:hover {
         transform: scale(1.1); /* Memperbesar tombol saat dihover */
     }
+
+    .input-gambar {
+    margin: 0;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    justify-content: center;
+    }
+
 </style>
 
-<div class="neader" style="height: 120px; background-color: #305fe8;">
+<div class="neader" style="height: 120px; background-color: #305fe8; border-radius: 0;">
     <!-- <img src="{{ url_for('static', filename='images/blob.svg') }}" alt="" class="img-fluid blob"> -->
 </div>
+
 
 <div class="text-center mt-4 pt-4" style="color: black;">
     <div class="container px-0">
         <div class="row">
-            <!-- Kolom Kiri -->
+            <!-- Kolom Kanan -->
             <div class="col-md-8 order-md-2">
                 <center>
                     <!-- Sembunyikan tombol asli -->
@@ -57,7 +67,7 @@
                 <br><br>
                 <div class="row">
                     <div class="col-lg-12">
-                        <img class="img-fluid" src="{{ url_for('static', filename=file_path) }}" alt="image here">
+                        <img class="img-fluid" src="{{ url_for('static', filename=file_path) }}" alt="Gambar Belum di Upload">
                     </div>
                     {% if num_object is defined and request.path == '/count_white_objects' %}
                     <div class="col-12 mt-4">
@@ -73,7 +83,7 @@
                 </div>
             </div>
 
-            <!-- Kolom Kanan -->
+            <!-- Kolom Kiri -->
             <div class="col-md-4 order-md-1" style="max-height: 80vh; overflow-y: auto; padding-right: 30px;">
                 <h3 style="font-weight: bold;">Menu</h3>
                 <div class="collapse d-md-block" id="color">
