@@ -8,6 +8,10 @@ import cv2
 import matplotlib
 from skimage.morphology import skeletonize
 import json
+import os
+from sklearn.model_selection import train_test_split
+from sklearn.svm import SVC
+from sklearn.metrics import accuracy_score
 matplotlib.use('Agg') 
 
 
@@ -620,3 +624,64 @@ def indent_citra():
     digit = uji_pengenalan_angka_segmentasi(daftar_citra_uji, kode_chain_freeman_digit)
     print("digit yang dikenali",digit)
     return digit
+
+def load_data(dataset_path):
+    images = []
+    labels = []
+    for image_name in os.listdir(dataset_path):
+        image_path = os.path.join(dataset_path, image_name)
+        image = cv2.imread(image_path)
+        if image is not None:
+            images.append(image)
+            # Menggunakan nama file (tanpa ekstensi) sebagai label
+            label = image_name.split('.')[0]  
+            labels.append(label)
+    return np.array(images), np.array(labels)
+
+
+# Fungsi untuk pra-pemrosesan gambar
+def preprocess_image(image):
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    gray = cv2.equalizeHist(gray)
+    resized = cv2.resize(gray, (64, 64))  # Ensure consistent image size
+    return resized.flatten() / 255.0
+
+# Fungsi untuk melatih model SVM
+def train_model(X_train, y_train):
+    model = SVC(kernel='linear')
+    model.fit(X_train, y_train)
+    return model
+
+# Fungsi untuk mendeteksi emoji dari gambar baru
+def detect_emoji(model, image):
+    processed_image = preprocess_image(image)
+    prediction = model.predict([processed_image])
+    return prediction[0]
+
+# Fungsi utama untuk menjalankan seluruh pipeline
+def deteksi_emoji():
+    dataset_path = 'emoji'  # Path to your emoji dataset folder
+    images, labels = load_data(dataset_path)
+
+    if len(images) == 0 or len(labels) == 0:
+        print("Dataset is empty. Please check the dataset path and structure.")
+        return
+    
+    print(f"Loaded {len(images)} images with {len(np.unique(labels))} unique labels.")
+
+    images = np.array([preprocess_image(img) for img in images])
+    
+    X_train, X_test, y_train, y_test = train_test_split(images, labels, test_size=0.2, random_state=42)
+    
+    model = train_model(X_train, y_train)
+    
+    # Evaluasi model
+    y_pred = model.predict(X_test)
+    print(f'Accuracy: {accuracy_score(y_test, y_pred)}')
+    
+    # Testing on a new image
+    new_image_path = 'static/img/img_now.jpg' # Update this path
+    new_image = cv2.imread(new_image_path)
+    result = detect_emoji(model, new_image)
+    print(f'Detected emoji: {result}')
+    return result

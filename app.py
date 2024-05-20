@@ -229,6 +229,12 @@ def training_data():
     image_processing.training_data()
     return render_template("uploaded.html", file_path="img/img_now.jpg")
 
+@app.route("/deteksi_emoji", methods=["POST"])
+@nocache
+def deteksi_emoji():
+    num_object = image_processing.deteksi_emoji()
+    return render_template("uploaded.html", file_path="img/img_now.jpg",num_object=num_object)
+
 
 @app.route("/thresholding", methods=["POST"])
 @nocache
