@@ -1,0 +1,113 @@
+{% extends "layout.html" %}
+{% block body %}
+<style>
+    /* CSS untuk menyesuaikan tampilan navbar */
+    .neader {
+        border-radius: 15px; /* Menambahkan lengkungan pada sudut */
+        transition: background-color 0.3s; /* Transisi untuk efek hover */
+    }
+
+    .neader:hover {
+        background-color: #2c4ab8; /* Warna latar belakang berubah saat dihover */
+    }
+
+    /* CSS untuk animasi tombol navbar */
+    .btn-primary {
+        transition: transform 0.2s ease; /* Transisi untuk efek transform */
+    }
+
+    .btn-primary:hover {
+        transform: scale(1.1); /* Memperbesar tombol saat dihover */
+    }
+
+    .video-feed {
+        border: 5px solid #444;
+        padding: 5px;
+    }
+
+    .input-gambar {
+        margin: 0;
+        font-family: inherit;
+        font-size: inherit;
+        line-height: inherit;
+        justify-content: center;
+    }
+</style>
+
+<div class="neader" style="height: 120px; background-color: #305fe8; border-radius: 0;">
+    <!-- <img src="{{ url_for('static', filename='images/blob.svg') }}" alt="" class="img-fluid blob"> -->
+</div>
+
+<div class="text-center mt-4 pt-4" style="color: black;">
+    <div class="container px-0">
+        <div class="row">
+            <!-- Kolom Kanan -->
+            <div class="col-md-8 order-md-2">
+                <center>
+                    <!-- Video Render untuk Hand Gesture Control -->
+                    <div id="hand-gesture-video">
+                        <h4>Hand Gesture Control</h4>
+                        <p>Silakan gunakan kamera Anda untuk mengendalikan kursor dengan gerakan tangan.</p>
+                        <img src="" class="video-feed" alt="Video Feed" id="video-feed">
+                    </div>
+                </center>
+            </div>
+
+            <!-- Kolom Kiri -->
+            <div class="col-md-4 order-md-1" style="max-height: 80vh; overflow-y: auto; padding-right: 30px;">
+                <h3 style="font-weight: bold;">Menu</h3>
+                <div class="collapse d-md-block" id="color">
+                    <hr>
+                    <h5>Gesture Program</h5>
+                    <div class="row">
+                        <div class="col-md-12">
+                            
+                            <div class="mt-2 flex-fill bd-highlight">
+                                <form id="gesture-program-form">
+                                    <button type="button"  class="btn btn-primary btn-block" style="width: 100%;" onclick="startProgram('control_mouse')">Control Mouse</button>
+                                   
+                                </form>
+                            </div>
+                            <div class="mt-2 flex-fill bd-highlight">
+                                <form id="gesture-program-form">
+                                    <button type="button"  class="btn btn-primary btn-block" style="width: 100%;" onclick="startProgram('fruit_ninja')">Fruit Ninja Game</button>
+                            
+                                   
+                                </form>
+                            </div>
+
+                        </div>
+                    </div>
+                    <hr/>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="mt-2 flex-fill bd-highlight">
+                                <form id="" action="{{ url_for('index') }}" method="GET" enctype="multipart/form-data">
+                                    <button type="submit" class="btn btn-primary btn-block" style="width: 100%;">Kembali</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function startProgram(program) {
+        const videoFeed = document.getElementById('video-feed');
+        fetch(`{{ url_for('hand_gesture_control.start_gesture_program') }}?program=${program}`)
+            .then(response => {
+                if (response.ok) {
+                    videoFeed.src = `{{ url_for('hand_gesture_control.video_feed') }}?program=${program}`;
+                } else {
+                    alert('Failed to start the program.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+</script>
+{% endblock %}
