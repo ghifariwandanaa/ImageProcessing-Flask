@@ -1,11 +1,14 @@
+from flask import Flask, Blueprint, render_template, Response, request, jsonify
 import cv2
 import numpy as np
-from flask import Blueprint, render_template, Response, request, jsonify
 import mediapipe as mp
 import pyautogui
 from collections import deque
 import random
 import time
+import threading
+
+app = Flask(__name__)
 
 hand_gesture_control_bp = Blueprint('hand_gesture_control', __name__)
 
@@ -14,6 +17,16 @@ mp_hands = mp.solutions.hands
 
 hands = mp_hands.Hands(min_detection_confidence=0.7, min_tracking_confidence=0.5)
 
+accuracy_results = {
+    'control_mouse': 0.0,
+    'fruit_ninja': 0.0
+}
+
+def calculate_accuracy(total_frames, frames_with_detection, program):
+    accuracy = (frames_with_detection / total_frames) * 100 if total_frames > 0 else 0
+    accuracy_results[program] = accuracy
+    print(f"{program.capitalize()} Hand Detection Accuracy: {accuracy:.2f}%")
+
 def generate_frames_control_mouse():
     cap = cv2.VideoCapture(0)
     screen_width, screen_height = pyautogui.size()
@@ -21,8 +34,19 @@ def generate_frames_control_mouse():
     alpha = 0.2
     ema_x, ema_y = None, None
 
+    total_frames = 0
+    frames_with_detection = 0
+
     def calculate_distance(point1, point2):
         return np.sqrt((point1.x - point2.x) ** 2 + (point1.y - point2.y) ** 2)
+
+    def accuracy_updater():
+        nonlocal total_frames, frames_with_detection
+        while cap.isOpened():
+            calculate_accuracy(total_frames, frames_with_detection, 'control_mouse')
+            time.sleep(1)
+
+    threading.Thread(target=accuracy_updater, daemon=True).start()
 
     while True:
         ret, frame = cap.read()
@@ -33,8 +57,11 @@ def generate_frames_control_mouse():
         h, w, _ = frame.shape
         rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         result = hands.process(rgb_frame)
+        
+        total_frames += 1
 
         if result.multi_hand_landmarks:
+            frames_with_detection += 1
             for hand_landmarks in result.multi_hand_landmarks:
                 index_finger_tip = hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_TIP]
                 thumb_tip = hand_landmarks.landmark[mp_hands.HandLandmark.THUMB_TIP]
@@ -86,6 +113,9 @@ def generate_frames_fruit_ninja():
     start_time = time.time()
     game_over = False
 
+    total_frames = 0
+    frames_with_detection = 0
+
     def create_circle():
         return {
             'x': random.randint(50, 590),
@@ -117,6 +147,14 @@ def generate_frames_fruit_ninja():
             })
         return particles
 
+    def accuracy_updater():
+        nonlocal total_frames, frames_with_detection
+        while cap.isOpened():
+            calculate_accuracy(total_frames, frames_with_detection, 'fruit_ninja')
+            time.sleep(1)
+
+    threading.Thread(target=accuracy_updater, daemon=True).start()
+
     while cap.isOpened():
         ret, frame = cap.read()
         if not ret:
@@ -126,6 +164,8 @@ def generate_frames_fruit_ninja():
         h, w, _ = frame.shape
         frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         result = hands.process(frame_rgb)
+
+        total_frames += 1
 
         for particle in list(particles):
             particle['x'] += particle['vx']
@@ -140,6 +180,7 @@ def generate_frames_fruit_ninja():
             cv2.circle(frame, (circle['x'], circle['y']), circle['radius'], circle['color'], -1)
 
         if result.multi_hand_landmarks and not game_over:
+            frames_with_detection += 1
             for hand_landmarks in result.multi_hand_landmarks:
                 index_finger_tip = hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_TIP]
                 index_finger_tip_x = int(index_finger_tip.x * w)
@@ -201,3 +242,11 @@ def start_gesture_program():
 @hand_gesture_control_bp.route('/')
 def index():
     return render_template('hand_gesture_page.html')
+
+@hand_gesture_control_bp.route('/get_accuracy')
+def get_accuracy():
+    return jsonify(accuracy_results)
+
+
+if __name__ == "__main__":
+    app.run(debug=True)

@@ -48,6 +48,12 @@
                     <div id="hand-gesture-video">
                         <h4>Hand Gesture Control</h4>
                         <p>Silakan gunakan kamera Anda untuk mengendalikan kursor dengan gerakan tangan.</p>
+                        <div id="accuracy">
+                            <h2>Accuracy Results</h2>
+                            <p id="control_mouse_accuracy">Control Mouse Accuracy: -- %</p>
+                            <p id="fruit_ninja_accuracy">Fruit Ninja Accuracy: -- %</p>
+                           
+                        </div>
                         <img src="" class="video-feed" alt="Video Feed" id="video-feed">
                     </div>
                 </center>
@@ -61,21 +67,16 @@
                     <h5>Gesture Program</h5>
                     <div class="row">
                         <div class="col-md-12">
-                            
                             <div class="mt-2 flex-fill bd-highlight">
                                 <form id="gesture-program-form">
-                                    <button type="button"  class="btn btn-primary btn-block" style="width: 100%;" onclick="startProgram('control_mouse')">Control Mouse</button>
-                                   
+                                    <button type="button" class="btn btn-primary btn-block" style="width: 100%;" onclick="startProgram('control_mouse')">Control Mouse</button>
                                 </form>
                             </div>
                             <div class="mt-2 flex-fill bd-highlight">
                                 <form id="gesture-program-form">
-                                    <button type="button"  class="btn btn-primary btn-block" style="width: 100%;" onclick="startProgram('fruit_ninja')">Fruit Ninja Game</button>
-                            
-                                   
+                                    <button type="button" class="btn btn-primary btn-block" style="width: 100%;" onclick="startProgram('fruit_ninja')">Fruit Ninja Game</button>
                                 </form>
                             </div>
-
                         </div>
                     </div>
                     <hr/>
@@ -109,5 +110,17 @@
                 console.error('Error:', error);
             });
     }
+
+    function fetchAccuracy() {
+        fetch('/hand_gesture_control/get_accuracy')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('control_mouse_accuracy').innerText = `Control Mouse Accuracy: ${data.control_mouse.toFixed(2)} %`;
+                document.getElementById('fruit_ninja_accuracy').innerText = `Fruit Ninja Accuracy: ${data.fruit_ninja.toFixed(2)} %`;
+            });
+    }
+
+    // Fetch accuracy every 5 seconds
+    setInterval(fetchAccuracy, 500);
 </script>
 {% endblock %}
